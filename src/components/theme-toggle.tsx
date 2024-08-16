@@ -17,7 +17,7 @@ export function ModeToggle() {
 	};
 
 	return (
-		<div className='flex items-center space-x-4'>
+		<div className='flex items-center space-x-2'>
 			<Label className='flex items-center'>
 				<Sun className='h-5 w-5 text-yellow-500' />
 				<span className='sr-only'>Light Mode</span>

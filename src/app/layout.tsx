@@ -32,8 +32,10 @@ export default function RootLayout({
 					defaultTheme='system'
 					enableSystem
 					disableTransitionOnChange>
-					<Navbar />
-					{children}
+					<div className='p-4 lg:max-w-screen-xl mx-auto'>
+						<Navbar />
+						{children}
+					</div>
 				</ThemeProvider>
 			</body>
 		</html>
