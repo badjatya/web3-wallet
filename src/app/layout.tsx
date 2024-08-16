@@ -4,6 +4,7 @@ import { Inter as FontSans } from "next/font/google";
 import { cn } from "@/lib/utils";
 import { ThemeProvider } from "@/components/theme-provider";
 import Navbar from "@/components/layout/Navbar";
+import { Toaster } from "react-hot-toast";
 
 const fontSans = FontSans({
 	subsets: ["latin"],
@@ -35,6 +36,7 @@ export default function RootLayout({
 					<div className='p-4 lg:max-w-screen-xl mx-auto'>
 						<Navbar />
 						{children}
+						<Toaster position='bottom-right' />
 					</div>
 				</ThemeProvider>
 			</body>
