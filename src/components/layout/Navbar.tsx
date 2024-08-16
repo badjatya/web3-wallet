@@ -13,7 +13,7 @@ import {
 	AlertDialogTitle,
 	AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
-import { generateMnemonic } from "bip39";
+import { generateMnemonic, mnemonicToSeedSync } from "bip39";
 import toast from "react-hot-toast";
 
 type Props = {};
@@ -46,6 +46,12 @@ const Navbar = (props: Props) => {
 		if (mnemonic) {
 			toast.success("Wallet created successfully");
 			localStorage.setItem("mnemonic", mnemonic);
+			localStorage.setItem(
+				"seed",
+				mnemonicToSeedSync(mnemonic).toString("hex")
+			);
+			localStorage.setItem("solAccountCount", "0");
+			localStorage.setItem("ethAccountCount", "0");
 			setShowDialog(false);
 		}
 	};
