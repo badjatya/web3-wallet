@@ -60,6 +60,7 @@ export default function CryptoTable() {
 					promises.push(
 						getSolBalance(publicKey).then((balance) => {
 							solAccounts.push({
+								crypto: "sol",
 								accountName,
 								publicKey,
 								privateKey,
@@ -83,6 +84,7 @@ export default function CryptoTable() {
 					promises.push(
 						getEthBalance(publicKey).then((balance) => {
 							ethAccounts.push({
+								crypto: "eth",
 								accountName,
 								publicKey,
 								privateKey,

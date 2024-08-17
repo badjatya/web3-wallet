@@ -35,6 +35,7 @@ import { DialogDescription } from "@radix-ui/react-dialog";
 // This type is used to define the shape of our data.
 // You can use a Zod schema here if you want.
 export type Account = {
+	crypto: string;
 	accountName: string;
 	publicKey: string;
 	privateKey: string;
@@ -252,12 +253,16 @@ const Send = ({ row }: { row: Row<Account> }) => {
 	});
 
 	const onSubmit: SubmitHandler<SendSolFormInputs> = async (data) => {
-		const id = await sendSol(
-			row.original.privateKey,
-			data.publicKey,
-			data.amount
-		);
-		setTransactionId(id);
+		if (row.original.crypto === "sol") {
+			const id = await sendSol(
+				row.original.privateKey,
+				data.publicKey,
+				data.amount
+			);
+			setTransactionId(id);
+		} else if (row.original.crypto === "eth") {
+			toast.error("Ethereum transactions are not supported yet.");
+		}
 	};
 
 	const copyToClipboard = () => {
@@ -273,7 +278,7 @@ const Send = ({ row }: { row: Row<Account> }) => {
 			<DialogContent className='sm:max-w-[425px]'>
 				<DialogHeader>
 					<DialogTitle className='text-xl font-semibold'>
-						{transactionId ? "Transaction Successful" : "Send SOL"}
+						{transactionId ? "Transaction Successful" : "Send"}
 					</DialogTitle>
 					{transactionId && (
 						<DialogDescription>
@@ -303,7 +308,7 @@ const Send = ({ row }: { row: Row<Account> }) => {
 
 							<div className='flex flex-col gap-2'>
 								<Label htmlFor='amount' className=''>
-									Amount (SOL)
+									Amount
 								</Label>
 								<Input
 									id='amount'

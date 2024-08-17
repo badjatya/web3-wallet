@@ -1,6 +1,5 @@
 import axios from "axios";
 import toast from "react-hot-toast";
-import { WeiPerEther } from "ethers";
 
 const ETH_RPC_URL = process.env.NEXT_PUBLIC_ETH_RPC!;
 
