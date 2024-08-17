@@ -4,7 +4,6 @@ import toast from "react-hot-toast";
 const ETH_RPC_URL = process.env.NEXT_PUBLIC_ETH_RPC!;
 
 const useEth = () => {
-	console.log("ETH_RPC_URL: ", ETH_RPC_URL);
 	const getBalance = async (publicKey: string) => {
 		try {
 			const res = await axios.post(ETH_RPC_URL, {

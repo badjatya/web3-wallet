@@ -12,10 +12,8 @@ import bs58 from "bs58";
 const SOL_RPC_URL = process.env.NEXT_PUBLIC_SOL_RPC!;
 
 const useSol = () => {
-	console.log("SOL_RPC_URL: ", SOL_RPC_URL);
 	// Function to get balance
 	const getBalance = async (publicKey: string) => {
-		console.log("publicKey: ", publicKey);
 		try {
 			const res = await axios.post(SOL_RPC_URL, {
 				jsonrpc: "2.0",
@@ -24,17 +22,12 @@ const useSol = () => {
 				params: [publicKey],
 			});
 
-			console.log("res: ", res);
-
 			const balance = res.data.result.value / LAMPORTS_PER_SOL;
-
-			console.log("balance: ", balance);
 
 			return balance;
 		} catch (error) {
 			toast.error("Failed to get balance");
-			console.log("Error: ", error);
-			console.error(error);
+			console.log(error);
 		}
 	};
 
