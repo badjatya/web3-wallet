@@ -25,7 +25,6 @@ const Navbar = (props: Props) => {
 	useEffect(() => {
 		const mn = localStorage.getItem("mnemonic");
 		if (mn) {
-			console.log("mnemonic", mn);
 			setMnemonic(mn);
 			setShowDialog(false);
 		}

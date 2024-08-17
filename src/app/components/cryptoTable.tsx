@@ -6,12 +6,10 @@ import { DataTable } from "./data-table";
 
 import { derivePath } from "ed25519-hd-key";
 import { Keypair } from "@solana/web3.js";
+import { Wallet, HDNodeWallet } from "ethers";
 import nacl from "tweetnacl";
-
-const path = {
-	sol: "m/44'/501'/0'/0'",
-	eth: "m/44'/60'/0'/0'",
-};
+import { mnemonicToSeedSync } from "bip39";
+import getPrivateKey from "./privateKey";
 
 export default function CryptoTable() {
 	const [data, setData] = useState<{ [key: string]: Account[] }>({
@@ -19,6 +17,7 @@ export default function CryptoTable() {
 		eth: [],
 	});
 	const [seed, setSeed] = useState<string>("");
+	const [mnemonic, setMnemonic] = useState<string>("");
 	const [cryptos, setCryptos] = useState<string[]>(["sol", "eth"]);
 	const [selectedCrypto, setSelectedCrypto] = useState<string>("sol");
 	const [accountCount, setAccountCount] = useState<{
@@ -31,10 +30,12 @@ export default function CryptoTable() {
 
 	useEffect(() => {
 		const seed = localStorage.getItem("seed") || "";
+		const mne = localStorage.getItem("mnemonic") || "";
 		const solAccountCount = localStorage.getItem("solAccountCount") || "0";
 		const ethAccountCount = localStorage.getItem("ethAccountCount") || "0";
 
 		setSeed(seed);
+		setMnemonic(mne);
 		setAccountCount({
 			sol: parseInt(solAccountCount),
 			eth: parseInt(ethAccountCount),
@@ -49,19 +50,33 @@ export default function CryptoTable() {
 				const accountName = `Account ${i + 1}`;
 				const path = `m/44'/501'/${i}'/0'`;
 				const derivedSeed = derivePath(path, seed).key;
-				const privateKey =
+				const privateKeyUInt8Array =
 					nacl.sign.keyPair.fromSeed(derivedSeed).secretKey;
+				const privateKey = getPrivateKey({
+					privateKey: privateKeyUInt8Array,
+				});
 				const publicKey =
-					Keypair.fromSecretKey(privateKey).publicKey.toBase58();
+					Keypair.fromSecretKey(
+						privateKeyUInt8Array
+					).publicKey.toBase58();
 				solAccounts.push({ accountName, publicKey, privateKey });
 			}
 		} else if (selectedCrypto === "eth") {
-			// for (let i = 0; i < parseInt(ethAccountCount); i++) {
-			// 	const accountName = `Account ${i + 1}`;
-			// 	const publicKey = `ETH Account ${i + 1} Public Key`;
-			// 	const privateKey = `ETH Account ${i + 1} Private Key`;
-			// 	ethAccounts.push({ accountName, publicKey, privateKey });
-			// }
+			for (let i = 0; i < accountCount.eth; i++) {
+				const accountName = `Account ${i + 1}`;
+				const path = `m/44'/60'/${i}'/0'`;
+				const ethSeed = mnemonicToSeedSync(mnemonic);
+				const hdNode = HDNodeWallet.fromSeed(ethSeed);
+				const child = hdNode.derivePath(path);
+				const privateKey = child.privateKey;
+				const wallet = new Wallet(privateKey);
+				const publicKey = wallet.address;
+				ethAccounts.push({
+					accountName,
+					publicKey,
+					privateKey,
+				});
+			}
 		}
 		setData({ sol: solAccounts, eth: ethAccounts });
 	}, [seed, accountCount.sol, accountCount.eth, selectedCrypto]);

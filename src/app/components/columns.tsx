@@ -14,14 +14,13 @@ import {
 	DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import toast from "react-hot-toast";
-import getPrivateKey from "./privateKey";
 
 // This type is used to define the shape of our data.
 // You can use a Zod schema here if you want.
 export type Account = {
 	accountName: string;
 	publicKey: string;
-	privateKey: Uint8Array;
+	privateKey: string;
 };
 
 export const columns: ColumnDef<Account>[] = [
@@ -70,7 +69,42 @@ export const columns: ColumnDef<Account>[] = [
 		accessorKey: "privateKey",
 		header: "Private Key",
 		cell: ({ row }) => {
-			return <PrivateKeyCell privateKey={row.original.privateKey} />;
+			const key = row.original.privateKey;
+			const [visible, setVisible] = useState(false);
+
+			const toggleVisibility = () => {
+				setVisible(!visible);
+			};
+
+			const copyToClipboard = async () => {
+				try {
+					await navigator.clipboard.writeText(key);
+					toast("Private key copied to clipboard!");
+				} catch (err) {
+					toast("Failed to copy the private key.");
+				}
+			};
+			return (
+				<div className='flex items-center'>
+					<p className='mr-2'>{visible ? key : "*".repeat(20)}</p>
+					<button
+						onClick={toggleVisibility}
+						className='p-1 rounded hover:bg-gray-200 transition'
+						aria-label='Toggle Key Visibility'>
+						{visible ? (
+							<EyeOff className='w-4 h-4' />
+						) : (
+							<Eye className='w-4 h-4' />
+						)}
+					</button>
+					<button
+						onClick={copyToClipboard}
+						className='p-1 ml-2 rounded hover:bg-gray-200 transition'
+						aria-label='Copy to Clipboard'>
+						<Copy className='w-4 h-4' />
+					</button>
+				</div>
+			);
 		},
 	},
 	{
@@ -97,9 +131,7 @@ export const columns: ColumnDef<Account>[] = [
 						</DropdownMenuItem>
 						<DropdownMenuItem
 							onClick={() => {
-								navigator.clipboard.writeText(
-									getPrivateKey({ privateKey })
-								);
+								navigator.clipboard.writeText(privateKey);
 							}}>
 							Copy Private key
 						</DropdownMenuItem>
@@ -112,9 +144,8 @@ export const columns: ColumnDef<Account>[] = [
 	},
 ];
 
-const PrivateKeyCell = ({ privateKey }: { privateKey: Uint8Array }) => {
+const PrivateKeyCell = ({ key }: { key: string }) => {
 	const [visible, setVisible] = useState(false);
-	const key = getPrivateKey({ privateKey });
 
 	const toggleVisibility = () => {
 		setVisible(!visible);
