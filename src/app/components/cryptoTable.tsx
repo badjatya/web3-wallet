@@ -11,10 +11,12 @@ import nacl from "tweetnacl";
 import { mnemonicToSeedSync } from "bip39";
 import getPrivateKey from "./privateKey";
 import useSol from "@/hooks/useSol";
+import useEth from "@/hooks/useEth";
 import { LoaderCircle } from "lucide-react";
 
 export default function CryptoTable() {
-	const { getBalance } = useSol();
+	const { getBalance: getSolBalance } = useSol();
+	const { getBalance: getEthBalance } = useEth();
 	const [data, setData] = useState<{ [key: string]: Account[] }>({
 		sol: [],
 		eth: [],
@@ -56,7 +58,7 @@ export default function CryptoTable() {
 						).publicKey.toBase58();
 
 					promises.push(
-						getBalance(publicKey).then((balance) => {
+						getSolBalance(publicKey).then((balance) => {
 							solAccounts.push({
 								accountName,
 								publicKey,
@@ -68,6 +70,7 @@ export default function CryptoTable() {
 				}
 				await Promise.all(promises);
 			} else if (selectedCrypto === "eth") {
+				const promises = [];
 				for (let i = 0; i < accountCount.eth; i++) {
 					const accountName = `Account ${i + 1}`;
 					const path = `m/44'/60'/${i}'/0'`;
@@ -77,13 +80,18 @@ export default function CryptoTable() {
 					const privateKey = child.privateKey;
 					const wallet = new Wallet(privateKey);
 					const publicKey = wallet.address;
-					ethAccounts.push({
-						accountName,
-						publicKey,
-						privateKey,
-						balance: 0, // Assuming balance fetch for ETH happens elsewhere
-					});
+					promises.push(
+						getEthBalance(publicKey).then((balance) => {
+							ethAccounts.push({
+								accountName,
+								publicKey,
+								privateKey,
+								balance: balance!,
+							});
+						})
+					);
 				}
+				await Promise.all(promises);
 			}
 			setData({ sol: solAccounts, eth: ethAccounts });
 		} catch (error) {
