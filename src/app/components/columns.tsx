@@ -18,7 +18,7 @@ import {
 export type Account = {
 	accountName: string;
 	publicKey: string;
-	privateKey: string;
+	privateKey: Uint8Array;
 };
 
 export const columns: ColumnDef<Account>[] = [
@@ -43,7 +43,11 @@ export const columns: ColumnDef<Account>[] = [
 	},
 	{
 		accessorKey: "privateKey",
-		header: "Private Key",
+		cell: ({ row }) => {
+			const decoder = new TextDecoder("utf-8");
+			const key = decoder.decode(row.original.privateKey);
+			return <p>{key}</p>;
+		},
 	},
 	{
 		id: "actions",
@@ -68,9 +72,11 @@ export const columns: ColumnDef<Account>[] = [
 							Copy Public key
 						</DropdownMenuItem>
 						<DropdownMenuItem
-							onClick={() =>
-								navigator.clipboard.writeText(privateKey)
-							}>
+							onClick={() => {
+								const decoder = new TextDecoder("utf-8");
+								const key = decoder.decode(privateKey);
+								navigator.clipboard.writeText(key);
+							}}>
 							Copy Private key
 						</DropdownMenuItem>
 						<DropdownMenuSeparator />
