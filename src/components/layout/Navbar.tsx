@@ -13,6 +13,7 @@ import {
 	AlertDialogTitle,
 	AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
+
 import { generateMnemonic, mnemonicToSeedSync } from "bip39";
 import toast from "react-hot-toast";
 
@@ -54,6 +55,16 @@ const Navbar = (props: Props) => {
 			setShowDialog(false);
 		}
 	};
+
+	const handleDeleteWallet = () => {
+		localStorage.removeItem("mnemonic");
+		localStorage.removeItem("seed");
+		localStorage.removeItem("solAccountCount");
+		localStorage.removeItem("ethAccountCount");
+		setMnemonic(null);
+		setShowDialog(true);
+		window.location.reload();
+	};
 	return (
 		<nav className='flex justify-between items-center'>
 			<h1 className='text-xl font-bold lg:text-2xl'>Web3 Wallet</h1>
@@ -68,7 +79,14 @@ const Navbar = (props: Props) => {
 						Source Code
 					</a>
 				</Button>
-				{!showDialog && <Button size='sm'>Wallet Created</Button>}
+				{!showDialog && (
+					<Button
+						size='sm'
+						variant={"destructive"}
+						onClick={handleDeleteWallet}>
+						Delete Wallet
+					</Button>
+				)}
 				{showDialog && (
 					<AlertDialog>
 						<AlertDialogTrigger asChild>

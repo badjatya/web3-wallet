@@ -90,44 +90,6 @@ export const columns: ColumnDef<Account>[] = [
 		cell: ({ row }) => {
 			return <PrivateKeyCell row={row} />;
 		},
-		// cell: ({ row }) => {
-		// 	const key = row.original.privateKey;
-		// 	const [visible, setVisible] = useState(false);
-
-		// 	const toggleVisibility = () => {
-		// 		setVisible(!visible);
-		// 	};
-
-		// 	const copyToClipboard = async () => {
-		// 		try {
-		// 			await navigator.clipboard.writeText(key);
-		// 			toast("Private key copied to clipboard!");
-		// 		} catch (err) {
-		// 			toast("Failed to copy the private key.");
-		// 		}
-		// 	};
-		// 	return (
-		// 		<div className='flex items-center'>
-		// 			<p className='mr-2'>{visible ? key : "*".repeat(20)}</p>
-		// 			<button
-		// 				onClick={toggleVisibility}
-		// 				className='p-1 rounded hover:bg-gray-200 transition'
-		// 				aria-label='Toggle Key Visibility'>
-		// 				{visible ? (
-		// 					<EyeOff className='w-4 h-4' />
-		// 				) : (
-		// 					<Eye className='w-4 h-4' />
-		// 				)}
-		// 			</button>
-		// 			<button
-		// 				onClick={copyToClipboard}
-		// 				className='p-1 ml-2 rounded hover:bg-gray-200 transition'
-		// 				aria-label='Copy to Clipboard'>
-		// 				<Copy className='w-4 h-4' />
-		// 			</button>
-		// 		</div>
-		// 	);
-		// },
 	},
 	{
 		accessorKey: "balance",
