@@ -5,7 +5,6 @@ import { WeiPerEther } from "ethers";
 const ETH_RPC_URL = process.env.NEXT_PUBLIC_ETH_RPC!;
 
 const useEth = () => {
-	console.log("WeiPerEther: ", WeiPerEther);
 	const getBalance = async (publicKey: string) => {
 		try {
 			const res = await axios.post(ETH_RPC_URL, {
