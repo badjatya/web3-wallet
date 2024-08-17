@@ -58,6 +58,16 @@ const Navbar = (props: Props) => {
 		<nav className='flex justify-between items-center'>
 			<h1 className='text-xl font-bold lg:text-2xl'>Web3 Wallet</h1>
 			<div className='flex items-center gap-4 lg:gap-8'>
+				<Button size='sm' variant='outline' asChild>
+					<a
+						href='https://github.com/badjatya/web3-wallet'
+						target='_blank'
+						rel='noopener noreferrer'
+						aria-label='GitHub'
+						className='text-primary  transition-colors'>
+						Source Code
+					</a>
+				</Button>
 				{!showDialog && <Button size='sm'>Wallet Created</Button>}
 				{showDialog && (
 					<AlertDialog>

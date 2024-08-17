@@ -5,6 +5,7 @@ import { cn } from "@/lib/utils";
 import { ThemeProvider } from "@/components/theme-provider";
 import Navbar from "@/components/layout/Navbar";
 import { Toaster } from "react-hot-toast";
+import Footer from "@/components/layout/Footer";
 
 const fontSans = FontSans({
 	subsets: ["latin"],
@@ -37,6 +38,7 @@ export default function RootLayout({
 						<Navbar />
 						{children}
 						<Toaster position='bottom-right' />
+						<Footer />
 					</div>
 				</ThemeProvider>
 			</body>
