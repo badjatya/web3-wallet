@@ -33,7 +33,7 @@ export default function RootLayout({
 					defaultTheme='system'
 					enableSystem
 					disableTransitionOnChange>
-					<div className='p-4 lg:max-w-screen-xl mx-auto'>
+					<div className='p-4 lg:container mx-auto'>
 						<Navbar />
 						{children}
 						<Toaster position='bottom-right' />

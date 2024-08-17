@@ -1,7 +1,8 @@
 "use client";
 
+import { useState } from "react";
 import { ColumnDef } from "@tanstack/react-table";
-import { MoreHorizontal, ArrowUpDown } from "lucide-react";
+import { MoreHorizontal, ArrowUpDown, Eye, EyeOff, Copy } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -12,8 +13,8 @@ import {
 	DropdownMenuSeparator,
 	DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import toast from "react-hot-toast";
 import getPrivateKey from "./privateKey";
-import { get } from "http";
 
 // This type is used to define the shape of our data.
 // You can use a Zod schema here if you want.
@@ -42,13 +43,34 @@ export const columns: ColumnDef<Account>[] = [
 	{
 		accessorKey: "publicKey",
 		header: "Public Key",
+		cell: ({ row }) => {
+			const key = row.original.publicKey;
+			const copyToClipboard = async () => {
+				try {
+					await navigator.clipboard.writeText(key);
+					toast("Public key copied to clipboard!");
+				} catch (err) {
+					toast("Failed to copy the public key.");
+				}
+			};
+			return (
+				<div className='flex items-center'>
+					<p className='mr-2'>{key}</p>
+					<button
+						onClick={copyToClipboard}
+						className='p-1 ml-2 rounded hover:bg-gray-200 transition'
+						aria-label='Copy to Clipboard'>
+						<Copy className='w-4 h-4' />
+					</button>
+				</div>
+			);
+		},
 	},
 	{
 		accessorKey: "privateKey",
+		header: "Private Key",
 		cell: ({ row }) => {
-			return (
-				<p>{getPrivateKey({ privateKey: row.original.privateKey })}</p>
-			);
+			return <PrivateKeyCell privateKey={row.original.privateKey} />;
 		},
 	},
 	{
@@ -89,3 +111,43 @@ export const columns: ColumnDef<Account>[] = [
 		},
 	},
 ];
+
+const PrivateKeyCell = ({ privateKey }: { privateKey: Uint8Array }) => {
+	const [visible, setVisible] = useState(false);
+	const key = getPrivateKey({ privateKey });
+
+	const toggleVisibility = () => {
+		setVisible(!visible);
+	};
+
+	const copyToClipboard = async () => {
+		try {
+			await navigator.clipboard.writeText(key);
+			toast("Private key copied to clipboard!");
+		} catch (err) {
+			toast("Failed to copy the private key.");
+		}
+	};
+
+	return (
+		<div className='flex items-center'>
+			<p className='mr-2'>{visible ? key : "*".repeat(20)}</p>
+			<button
+				onClick={toggleVisibility}
+				className='p-1 rounded hover:bg-gray-200 transition'
+				aria-label='Toggle Key Visibility'>
+				{visible ? (
+					<EyeOff className='w-4 h-4' />
+				) : (
+					<Eye className='w-4 h-4' />
+				)}
+			</button>
+			<button
+				onClick={copyToClipboard}
+				className='p-1 ml-2 rounded hover:bg-gray-200 transition'
+				aria-label='Copy to Clipboard'>
+				<Copy className='w-4 h-4' />
+			</button>
+		</div>
+	);
+};
