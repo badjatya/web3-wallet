@@ -21,6 +21,7 @@ export type Account = {
 	accountName: string;
 	publicKey: string;
 	privateKey: string;
+	balance: number;
 };
 
 export const columns: ColumnDef<Account>[] = [
@@ -108,6 +109,21 @@ export const columns: ColumnDef<Account>[] = [
 		},
 	},
 	{
+		accessorKey: "balance",
+		header: ({ column }) => {
+			return (
+				<Button
+					variant='ghost'
+					onClick={() =>
+						column.toggleSorting(column.getIsSorted() === "asc")
+					}>
+					Balance
+					<ArrowUpDown className='ml-2 h-4 w-4' />
+				</Button>
+			);
+		},
+	},
+	{
 		id: "actions",
 		cell: ({ row }) => {
 			const publicKey = row.original.publicKey;
@@ -143,42 +159,3 @@ export const columns: ColumnDef<Account>[] = [
 		},
 	},
 ];
-
-const PrivateKeyCell = ({ key }: { key: string }) => {
-	const [visible, setVisible] = useState(false);
-
-	const toggleVisibility = () => {
-		setVisible(!visible);
-	};
-
-	const copyToClipboard = async () => {
-		try {
-			await navigator.clipboard.writeText(key);
-			toast("Private key copied to clipboard!");
-		} catch (err) {
-			toast("Failed to copy the private key.");
-		}
-	};
-
-	return (
-		<div className='flex items-center'>
-			<p className='mr-2'>{visible ? key : "*".repeat(20)}</p>
-			<button
-				onClick={toggleVisibility}
-				className='p-1 rounded hover:bg-gray-200 transition'
-				aria-label='Toggle Key Visibility'>
-				{visible ? (
-					<EyeOff className='w-4 h-4' />
-				) : (
-					<Eye className='w-4 h-4' />
-				)}
-			</button>
-			<button
-				onClick={copyToClipboard}
-				className='p-1 ml-2 rounded hover:bg-gray-200 transition'
-				aria-label='Copy to Clipboard'>
-				<Copy className='w-4 h-4' />
-			</button>
-		</div>
-	);
-};
