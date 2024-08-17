@@ -15,7 +15,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import toast from "react-hot-toast";
 import { Row } from "@tanstack/react-table";
-import { useForm, SubmitHandler } from "react-hook-form";
+import { useForm, SubmitHandler, set } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import useSol from "@/hooks/useSol";
@@ -30,6 +30,7 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { DialogDescription } from "@radix-ui/react-dialog";
 
 // This type is used to define the shape of our data.
 // You can use a Zod schema here if you want.
@@ -228,6 +229,8 @@ const Send = ({ row }: { row: Row<Account> }) => {
 	const balance = row.original.balance;
 	const { sendSol } = useSol();
 
+	const [transactionId, setTransactionId] = useState<string | null>(null);
+
 	const SendSolSchema = z.object({
 		publicKey: z.string().min(1, "Public key is required"),
 		amount: z
@@ -248,9 +251,18 @@ const Send = ({ row }: { row: Row<Account> }) => {
 		},
 	});
 
-	const onSubmit: SubmitHandler<SendSolFormInputs> = (data) => {
-		console.log("Form data:", data);
-		sendSol(row.original.privateKey, data.publicKey, data.amount);
+	const onSubmit: SubmitHandler<SendSolFormInputs> = async (data) => {
+		const id = await sendSol(
+			row.original.privateKey,
+			data.publicKey,
+			data.amount
+		);
+		setTransactionId(id);
+	};
+
+	const copyToClipboard = () => {
+		navigator.clipboard.writeText(transactionId!);
+		toast("Transaction ID copied to clipboard!");
 	};
 
 	return (
@@ -261,52 +273,67 @@ const Send = ({ row }: { row: Row<Account> }) => {
 			<DialogContent className='sm:max-w-[425px]'>
 				<DialogHeader>
 					<DialogTitle className='text-xl font-semibold'>
-						Send SOL
+						{transactionId ? "Transaction Successful" : "Send SOL"}
 					</DialogTitle>
+					{transactionId && (
+						<DialogDescription>
+							Your transaction has been successfully sent!
+						</DialogDescription>
+					)}
 				</DialogHeader>
 				<form className='space-y-4'>
-					<div className='flex flex-col gap-2'>
-						<Label htmlFor='publicKey' className=''>
-							Recipient Public Key
-						</Label>
-						<Input
-							id='publicKey'
-							{...register("publicKey")}
-							className='col-span-3'
-							placeholder="Enter recipient's public key"
-						/>
-						{errors.publicKey && (
-							<p className='col-span-4 text-red-500 text-sm'>
-								{errors.publicKey.message}
-							</p>
-						)}
-					</div>
+					{!transactionId && (
+						<>
+							<div className='flex flex-col gap-2'>
+								<Label htmlFor='publicKey' className=''>
+									Recipient Public Key
+								</Label>
+								<Input
+									id='publicKey'
+									{...register("publicKey")}
+									className='col-span-3'
+									placeholder="Enter recipient's public key"
+								/>
+								{errors.publicKey && (
+									<p className='col-span-4 text-red-500 text-sm'>
+										{errors.publicKey.message}
+									</p>
+								)}
+							</div>
 
-					<div className='flex flex-col gap-2'>
-						<Label htmlFor='amount' className=''>
-							Amount (SOL)
-						</Label>
-						<Input
-							id='amount'
-							type='number'
-							step='0.00001'
-							{...register("amount", { valueAsNumber: true })}
-							className='col-span-3'
-							placeholder='Enter amount to send'
-						/>
-						{errors.amount && (
-							<p className='col-span-4 text-red-500 text-sm'>
-								{errors.amount.message}
-							</p>
-						)}
-					</div>
+							<div className='flex flex-col gap-2'>
+								<Label htmlFor='amount' className=''>
+									Amount (SOL)
+								</Label>
+								<Input
+									id='amount'
+									type='number'
+									step='0.00001'
+									{...register("amount", {
+										valueAsNumber: true,
+									})}
+									className='col-span-3'
+									placeholder='Enter amount to send'
+								/>
+								{errors.amount && (
+									<p className='col-span-4 text-red-500 text-sm'>
+										{errors.amount.message}
+									</p>
+								)}
+							</div>
+						</>
+					)}
 
 					<DialogFooter>
-						<Button
-							onSubmit={handleSubmit(onSubmit)}
-							variant='default'>
-							Send
-						</Button>
+						{transactionId ? (
+							<Button onClick={copyToClipboard}>
+								Copy Transaction ID
+							</Button>
+						) : (
+							<Button onClick={handleSubmit(onSubmit)}>
+								Send
+							</Button>
+						)}
 					</DialogFooter>
 				</form>
 			</DialogContent>

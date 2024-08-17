@@ -84,6 +84,7 @@ const useSol = () => {
 				"Transaction signature:",
 				sendTransactionResponse.result
 			);
+			return sendTransactionResponse.result;
 		} catch (error) {
 			toast.error("Transaction failed");
 			console.error("Error:", error);
