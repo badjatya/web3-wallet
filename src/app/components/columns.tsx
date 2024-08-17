@@ -12,6 +12,8 @@ import {
 	DropdownMenuSeparator,
 	DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import getPrivateKey from "./privateKey";
+import { get } from "http";
 
 // This type is used to define the shape of our data.
 // You can use a Zod schema here if you want.
@@ -44,9 +46,9 @@ export const columns: ColumnDef<Account>[] = [
 	{
 		accessorKey: "privateKey",
 		cell: ({ row }) => {
-			const decoder = new TextDecoder("utf-8");
-			const key = decoder.decode(row.original.privateKey);
-			return <p>{key}</p>;
+			return (
+				<p>{getPrivateKey({ privateKey: row.original.privateKey })}</p>
+			);
 		},
 	},
 	{
@@ -73,9 +75,9 @@ export const columns: ColumnDef<Account>[] = [
 						</DropdownMenuItem>
 						<DropdownMenuItem
 							onClick={() => {
-								const decoder = new TextDecoder("utf-8");
-								const key = decoder.decode(privateKey);
-								navigator.clipboard.writeText(key);
+								navigator.clipboard.writeText(
+									getPrivateKey({ privateKey })
+								);
 							}}>
 							Copy Private key
 						</DropdownMenuItem>
